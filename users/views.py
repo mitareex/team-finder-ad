@@ -26,13 +26,12 @@ def login_view(request):
     if request.user.is_authenticated:
         return redirect('projects:project_list')
 
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            user_instance = form.cleaned_data.get('user')
-            if user_instance is not None:
-                login(request, user_instance)
-                return redirect('projects:project_list')
+    form = LoginForm(request.POST or None)
+    if form.is_valid():
+        user_instance = form.cleaned_data.get('user')
+        if user_instance is not None:
+            login(request, user_instance)
+            return redirect('projects:project_list')
 
     return render(request, 'users/login.html', {'form': form})
 
