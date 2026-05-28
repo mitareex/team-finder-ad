@@ -1,33 +1,19 @@
 import re
 
 from django import forms
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.core.exceptions import ValidationError
 
-from .models import User
-from .validators import check_github_domain
+from projects.mixins import GitHubCleanMixin
+from .constants import (
+    PASSWORD_LABEL, EMAIL_LABEL, PHONE_PATTERN, LOGIN_ERROR_MESSAGE,
+    PHONE_ERROR_MESSAGE, OLD_PASSWORD_ERROR_MESSAGE, NEW_PASSWRODS_ERROR_MESSAGE,
+    PHONE_START_NUMBER_BAD, PHONE_START_NUMBER_GOOD, EXCEPT_FIRST_DIGIT,
+    OLD_PASSWORD_LABEL, NEW_PASSWORD1_LABEL, NEW_PASSWORD2_LABEL, GITHUB_LABEL,
+    NAME_LABEL, SURNAME_LABEL, PHONE_LABEL, ABOUT_LABEL, AVATAR_LABEL
+)
 
-
-PASSWORD_LABEL = 'Пароль'
-EMAIL_LABEL = 'Электронная почта'
-PHONE_PATTERN = r'^(8|\+7)\d{10}$'
-LOGIN_ERROR_MESSAGE = 'Неверная почта или пароль'
-PHONE_ERROR_MESSAGE = 'Введите корректный номер телефона: 8XXXXXXXXXX или +7XXXXXXXXXX'
-OLD_PASSWORD_ERROR_MESSAGE = 'Your old password was entered incorrectly. Please enter it again.'
-NEW_PASSWRODS_ERROR_MESSAGE = 'The two password fields didn’t match.'
-PHONE_START_NUMBER_BAD = '8'
-PHONE_START_NUMBER_GOOD = '+7'
-EXCEPT_FIRST_DIGIT = 1
-GITHUB_COM = 'github.com'
-OLD_PASSWORD_LABEL = 'Старый пароль'
-NEW_PASSWORD1_LABEL = 'Новый пароль'
-NEW_PASSWORD2_LABEL = 'Повторите новый пароль'
-GITHUB_LABEL = 'Ссылка на профиль GitHub'
-NAME_LABEL = 'Имя'
-SURNAME_LABEL = 'Фамилия'
-PHONE_LABEL = 'Номер телефона'
-ABOUT_LABEL = 'Обо мне'
-AVATAR_LABEL = 'Аватар профиля'
+User = get_user_model()
 
 
 class RegisterForm(forms.ModelForm):
@@ -70,7 +56,7 @@ class LoginForm(forms.Form):
         return cleaned_data
 
 
-class ProfileEditForm(forms.ModelForm):
+class ProfileEditForm(GitHubCleanMixin, forms.ModelForm):
     '''Profile edit form with phone number validation'''
     name = forms.CharField(
         label=NAME_LABEL,
@@ -88,7 +74,7 @@ class ProfileEditForm(forms.ModelForm):
         required=False
     )
     github_url = forms.URLField(
-        label=GITHUB_COM,
+        label=GITHUB_LABEL,
         required=False
     )
     about = forms.CharField(
@@ -103,14 +89,6 @@ class ProfileEditForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('name', 'surname', 'avatar', 'about', 'phone', 'github_url')
-
-    def clean_github_url(self):
-        github_url = self.cleaned_data.get('github_url')
-
-        if github_url:
-            check_github_domain(github_url)
-
-        return github_url
 
     def clean_phone(self):
         phone = self.cleaned_data.get('phone')

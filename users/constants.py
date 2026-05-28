@@ -1,0 +1,52 @@
+USERS_PER_PAGE = 12
+
+NAME_MAX_LENGTH = 124
+SURNAME_MAX_LENGTH = 124
+PHONE_MAX_LENGTH = 12
+ABOUT_MAX_LENGTH = 256
+
+COLOR_WHITE = (255, 255, 255)
+COLOR_CORNFLOWER_BLUE = (100, 149, 237)
+COLOR_DARK_SEA_GREEN = (143, 188, 143)
+COLOR_LIGHT_BOULDER = (244, 164, 96)
+COLOR_LIGHT_ORCHID = (218, 112, 214)
+COLOR_PALE_BLUE = (176, 224, 230)
+COLOR_SALMON_PINK = (250, 128, 114)
+
+BACKGROUND_COLORS = [
+    COLOR_CORNFLOWER_BLUE,
+    COLOR_DARK_SEA_GREEN,
+    COLOR_LIGHT_BOULDER,
+    COLOR_LIGHT_ORCHID,
+    COLOR_PALE_BLUE,
+    COLOR_SALMON_PINK,
+]
+
+AVATAR_SIZE = (200, 200)
+TEXT_COORDINATES = (85, 80)
+DEFAULT_LETTER = 'U'
+FONT_SIZE = 100
+
+PHONE_PATTERN = r'^(8|\+7)\d{10}$'
+PHONE_START_NUMBER_BAD = '8'
+PHONE_START_NUMBER_GOOD = '+7'
+EXCEPT_FIRST_DIGIT = 1
+
+LOGIN_ERROR_MESSAGE = 'Неверная почта или пароль'
+PHONE_ERROR_MESSAGE = 'Введите корректный номер телефона: 8XXXXXXXXXX или +7XXXXXXXXXX'
+OLD_PASSWORD_ERROR_MESSAGE = 'Your old password was entered incorrectly. Please enter it again.'
+NEW_PASSWRODS_ERROR_MESSAGE = 'The two password fields didn’t match.'
+IS_STUFF_ERROR_MESSAGE = 'Superuser must have is_stuff=True.'
+IS_SUPERUSER_ERROR_MESSAGE = 'Superuser must have is_superuser=True.'
+
+PASSWORD_LABEL = 'Пароль'
+EMAIL_LABEL = 'Электронная почта'
+OLD_PASSWORD_LABEL = 'Старый пароль'
+NEW_PASSWORD1_LABEL = 'Новый пароль'
+NEW_PASSWORD2_LABEL = 'Повторите новый пароль'
+GITHUB_LABEL = 'Ссылка на профиль GitHub'
+NAME_LABEL = 'Имя'
+SURNAME_LABEL = 'Фамилия'
+PHONE_LABEL = 'Номер телефона'
+ABOUT_LABEL = 'Обо мне'
+AVATAR_LABEL = 'Аватар профиля'

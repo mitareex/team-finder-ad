@@ -1,28 +1,23 @@
-from django.contrib.auth import update_session_auth_hash, login, logout
+from django.contrib.auth import update_session_auth_hash, login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
 from .forms import ChangePasswordForm, ProfileEditForm, RegisterForm, LoginForm
-from .models import User
 from projects.models import Project
+from projects.services import paginate_queryset
 
-
-USERS_PER_PAGE = 12
+User = get_user_model()
 
 
 def register_view(request):
     if request.user.is_authenticated:
         return redirect('projects:project_list')
 
-    if request.method == 'POST':
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            user_instance = form.save()
-            login(request, user_instance)
-            return redirect('projects:project_list')
-    else:
-        form = RegisterForm
+    form = RegisterForm(request.POST or None)
+    if form.is_valid():
+        user_instance = form.save()
+        login(request, user_instance)
+        return redirect('projects:project_list')
 
     return render(request, 'users/register.html', {'form': form})
 
@@ -38,8 +33,6 @@ def login_view(request):
             if user_instance is not None:
                 login(request, user_instance)
                 return redirect('projects:project_list')
-    else:
-        form = LoginForm()
 
     return render(request, 'users/login.html', {'form': form})
 
@@ -53,13 +46,10 @@ def logout_view(request):
 def edit_profile_view(request):
     user_instance = request.user
 
-    if request.method == 'POST':
-        form = ProfileEditForm(request.POST, request.FILES, instance=user_instance)
-        if form.is_valid():
-            form.save()
-            return redirect('users:user_details', user_id=user_instance.id)
-    else:
-        form = ProfileEditForm(instance=user_instance)
+    form = ProfileEditForm(request.POST or None, request.FILES or None, instance=user_instance)
+    if form.is_valid():
+        form.save()
+        return redirect('users:user_details', user_id=user_instance.id)
 
     return render(request, 'users/edit_profile.html', {'form': form})
 
@@ -68,15 +58,12 @@ def edit_profile_view(request):
 def change_password_view(request):
     user_instance = request.user
 
-    if request.method == 'POST':
-        form = ChangePasswordForm(user=user_instance, data=request.POST)
-        if form.is_valid():
-            user_instance.set_password(form.cleaned_data['new_password1'])
-            user_instance.save()
-            update_session_auth_hash(request, user_instance)
-            return redirect('users:user_details', user_id=user_instance.id)
-    else:
-        form = ChangePasswordForm(user=user_instance)
+    form = ChangePasswordForm(user=user_instance, data=request.POST or None)
+    if form.is_valid():
+        user_instance.set_password(form.cleaned_data['new_password1'])
+        user_instance.save()
+        update_session_auth_hash(request, user_instance)
+        return redirect('users:user_details', user_id=user_instance.id)
 
     return render(request, 'users/change_password.html', {'form': form})
 
@@ -115,14 +102,7 @@ def users_list_view(request):
 
             users_queryset = users_queryset.distinct()
 
-    paginator = Paginator(users_queryset, USERS_PER_PAGE)
-    page_number = request.GET.get('page')
-    try:
-        participants = paginator.page(page_number)
-    except PageNotAnInteger:
-        participants = paginator.page(1)
-    except EmptyPage:
-        participants = paginator.page(paginator.num_pages)
+    participants = paginate_queryset(request, users_queryset)
 
     context = {
         'participants': participants,
